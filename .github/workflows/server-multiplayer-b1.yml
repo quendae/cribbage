@@ -1,0 +1,24 @@
+name: Cribbage QQND multiplayer B2
+
+on:
+  push:
+    branches:
+      - 'feat/server-multiplayer-and-card-fixes'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run UI regression
+        run: node tests/ui-regression.mjs
+      - name: Run authoritative multiplayer regression
+        run: node tests/server-multiplayer-regression.mjs
+      - name: Run live QQND Cribbage smoke
+        run: node tests/live-qqnd-smoke.mjs
