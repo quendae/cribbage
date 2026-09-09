@@ -107,9 +107,13 @@
         if (active) { this.room = active; this.emit('room', { room: active, resumed: true }); }
         return;
       }
-      if (message.type === 'error' && message.code === 'invalid_session_credentials') {
-        this.clearSession();
-        this.send({ type: 'session.create', nickname: this.pendingNickname });
+      if (message.type === 'error') {
+        if (message.code === 'invalid_session_credentials') {
+          this.clearSession();
+          this.send({ type: 'session.create', nickname: this.pendingNickname });
+          return;
+        }
+        this.emit('server-error', message);
         return;
       }
       if (message.type === 'rooms.list') { this.emit('rooms', { rooms: message.rooms || [] }); return; }
@@ -123,13 +127,19 @@
         this.emit('room-left', message);
         return;
       }
+      if (message.type === 'match.found') {
+        this.room = message.room;
+        this.emit('match-found', message);
+        this.emit('room', { room: message.room, event: message.type });
+        return;
+      }
+      if (message.type === 'queue.joined' || message.type === 'queue.left') { this.emit('queue', message); return; }
       if (message.type === 'game.started') {
         this.started = true;
         this.room = message.room || this.room;
         this.emit('game-started', message);
         return;
       }
-      if (message.type === 'game.action') { this.emit('game-action', message); return; }
       if (message.type === 'game.state' || message.type === 'game.state.empty') { this.emit('game-state', message); return; }
       if (message.type === 'game.player.connection' || message.type === 'game.player.bot_takeover' || message.type === 'game.presence' || message.type === 'game.host.changed') {
         this.emit('presence', message);
@@ -144,9 +154,9 @@
     leaveRoom(roomId = this.room?.id) { if (roomId) this.send({ type: 'room.leave', roomId }); }
     startGame(settings = {}) { if (!this.room?.id) throw new Error('qqnd_room_missing'); this.send({ type: 'game.start', roomId: this.room.id, botCount: 0, settings }); }
     action(action, payload = {}, actionId) { if (!this.room?.id) return; this.send({ type: 'game.action', roomId: this.room.id, action, payload, ...(actionId ? { actionId } : {}) }); }
-    commit(revision, state) { if (!this.room?.id) return; this.send({ type: 'game.state.commit', roomId: this.room.id, revision, state }); }
-    publish(revision, toSessionId, state) { if (!this.room?.id || !toSessionId) return; this.send({ type: 'game.state.publish', roomId: this.room.id, revision, toSessionId, state }); }
     getState() { if (this.room?.id) this.send({ type: 'game.state.get', roomId: this.room.id }); }
+    joinQueue() { this.send({ type: 'queue.join', game: this.game }); }
+    leaveQueue() { this.send({ type: 'queue.leave', game: this.game }); }
     close() { this.manualClose = true; clearTimeout(this.reconnectTimer); try { this.ws?.close(); } catch (_) {} this.ws = null; }
   }
 
