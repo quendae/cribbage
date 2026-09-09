@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: '24'
       - name: Repair migration helper
-        run: python scripts/fix_patch_script.py
+        run: |
+          python scripts/fix_patch_script.py
+          python scripts/fix_patch_script_v2.py
       - name: Apply QQND multiplayer and UI fixes
         run: python scripts/apply_server_multiplayer_b1.py
       - name: Run existing UI regression
