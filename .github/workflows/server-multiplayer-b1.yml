@@ -6,32 +6,17 @@ on:
       - 'feat/server-multiplayer-and-card-fixes'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  migrate-and-test:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply authoritative frontend migration
-        run: python scripts/apply_server_authoritative_b2.py
-      - name: Run existing UI regression
+      - name: Run UI regression
         run: node tests/ui-regression.mjs
       - name: Run authoritative multiplayer regression
         run: node tests/server-multiplayer-regression.mjs
-      - name: Commit generated index
-        run: |
-          if git diff --quiet -- index.html; then
-            echo "index.html already up to date"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git commit -m "feat: switch Cribbage frontend to server-authoritative B2 [skip ci]"
-          git push
