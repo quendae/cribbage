@@ -1,0 +1,24 @@
+name: Cribbage UI regression
+
+on:
+  push:
+    branches:
+      - main
+      - 'ui/board-reference-dev-panel'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ui-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run UI regression checks
+        run: node tests/ui-regression.mjs
