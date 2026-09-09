@@ -20,3 +20,5 @@ jobs:
         run: node tests/ui-regression.mjs
       - name: Run authoritative multiplayer regression
         run: node tests/server-multiplayer-regression.mjs
+      - name: Run live QQND Cribbage smoke
+        run: node tests/live-qqnd-smoke.mjs
