@@ -89,7 +89,7 @@ transport = r'''  const mpEl=id=>document.getElementById(id);
   async function joinRoom(roomId){try{const client=await ensureMpClient();const id=String(roomId||mpEl('mpRoomInput')?.value||'').trim().toUpperCase();if(!id){mpStatus('mpGuestStatus','Wpisz kod pokoju.',true);return}client.joinRoom(id);mpStatus('mpGuestStatus',prefs.language==='pl'?'Dołączanie…':'Joining…')}catch(_){}}
   async function refreshRooms(){try{const client=await ensureMpClient();client.listRooms()}catch(_){}}
   function hiddenCards'''
-s, n = re.subn(r'  const mpEl=id=>document\.getElementById\(id\);.*?  function hiddenCards', transport, s, count=1, flags=re.S)
+s, n = re.subn(r'  const mpEl=id=>document\.getElementById\(id\);.*?  function hiddenCards', lambda _m: transport, s, count=1, flags=re.S)
 if n != 1:
     raise SystemExit('transport block replace failed')
 
@@ -102,11 +102,10 @@ new_anim = r'''  const flyingCards=new Set();
   function playCard'''
 s = s[:old_anim.start()] + new_anim + s[old_anim.end():]
 
-old_tick = r"  function networkTick(){if(mp.role!=='host'||!mp.connected||!mp.inGame||mp.channel?.readyState!=='open'||!state)return;const view=guestView(),signature=JSON.stringify(view);if(signature===mp.lastSignature)return;mp.lastSignature=signature;mp.seq++;mpSend({v:1,type:'state',seq:mp.seq,view})}\n  function sendGuestAction(action,payload={}){if(mp.role!=='guest'||!mp.connected)return;mp.clientSeq++;mpSend({v:1,type:'action',clientSeq:mp.clientSeq,action,payload})}"
-new_tick = r"  function networkTick(){if(mp.role!=='host'||!mp.connected||!mp.inGame||!mp.client||!state)return;const view=guestView(),signature=JSON.stringify(view);if(signature===mp.lastSignature)return;mp.lastSignature=signature;mp.revision=(mp.revision||0)+1;mp.client.commit(mp.revision,state);const guest=mp.roomData?.players?.find(p=>p.id!==mp.client.session?.id);if(guest)mp.client.publish(mp.revision,guest.id,view)}\n  function sendGuestAction(action,payload={}){if(mp.role!=='guest'||!mp.connected||!mp.client)return;mp.client.action(action,payload)}"
-if old_tick not in s:
-    raise SystemExit('network tick marker missing')
-s = s.replace(old_tick, new_tick, 1)
+new_tick = "  function networkTick(){if(mp.role!==\'host\'||!mp.connected||!mp.inGame||!mp.client||!state)return;const view=guestView(),signature=JSON.stringify(view);if(signature===mp.lastSignature)return;mp.lastSignature=signature;mp.revision=(mp.revision||0)+1;mp.client.commit(mp.revision,state);const guest=mp.roomData?.players?.find(p=>p.id!==mp.client.session?.id);if(guest)mp.client.publish(mp.revision,guest.id,view)}\n  function sendGuestAction(action,payload={}){if(mp.role!==\'guest\'||!mp.connected||!mp.client)return;mp.client.action(action,payload)}"
+s, n = re.subn(r"  function networkTick\(\)\{.*?\}\n  function sendGuestAction\(action,payload=\{\}\)\{.*?\}", lambda _m: new_tick, s, count=1, flags=re.S)
+if n != 1:
+    raise SystemExit('network tick replace failed')
 
 s, n = re.subn(r"  function startNetworkGame\(\)\{.*?\}\n  function networkClickInterceptor", "  function startNetworkGame(){if(mp.role!=='host'||!mp.connected||!mp.client||mp.roomData?.players?.length!==2)return;mp.client.startGame({target:121})}\n  function networkClickInterceptor", s, count=1, flags=re.S)
 if n != 1:
