@@ -9,7 +9,7 @@ check('QQND websocket client is loaded', html.includes('multiplayer-server.js?v=
 check('manual WebRTC exchange removed from runtime HTML', !html.includes('RTCPeerConnection') && !html.includes('createOffer()') && !html.includes('setRemoteDescription'));
 check('shared public/private room actions are present', mp.includes("type: 'room.create'") && mp.includes("type: 'room.join'"));
 check('authoritative client sends actions but never canonical state', mp.includes("type: 'game.action'") && !mp.includes('game.state.commit') && !mp.includes('game.state.publish') && !html.includes('.commit(mp.revision') && !html.includes('.publish(mp.revision'));
-check('frontend requires authoritative game.state', html.includes("msg.authoritative!==true") && html.includes("mode:'network-server'"));
+check('frontend requires authoritative game.state', html.includes("msg.authoritative!==true") && html.includes('const next=normalizeNetworkState(msg.state)') && html.includes("state.mode!=='network-server'"));
 check('session resume is persisted locally', mp.includes('session.resume') && mp.includes('resumeToken'));
 check('Quick Play uses shared matchmaking queue', mp.includes("type: 'queue.join'") && html.includes("data-action=\"mp-quick\""));
 check('all table cards share player card CSS variables', html.includes('--game-card-w:94px') && html.includes('.peg-cards .card,.peg-cards .card-back') && html.includes('#resultCards .card,#resultCards .card-back'));
