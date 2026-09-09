@@ -36,10 +36,11 @@ class SocketClient {
     while (Date.now() < deadline) {
       const index = this.queue.findIndex(message => message?.type === type && predicate(message));
       if (index >= 0) return this.queue.splice(index, 1)[0];
+      const immediateError = this.queue.find(message => message?.type === 'error');
+      if (immediateError && type !== 'error') throw new Error(`${this.label}: server error while waiting for ${type}: ${JSON.stringify(immediateError)}`);
       await sleep(25);
     }
-    const seen = this.queue.slice(-12).map(message => message?.type || '?').join(', ');
-    throw new Error(`${this.label}: timeout waiting for ${type}; queued=[${seen}]`);
+    throw new Error(`${this.label}: timeout waiting for ${type}; queued=${JSON.stringify(this.queue.slice(-12))}`);
   }
 
   async createSession(nickname) {
@@ -129,7 +130,7 @@ try {
   assert.ok(legalId, 'active player must have a legal opening card');
   const peggingRevision = Math.min(hostState.revision, guestState.revision);
   actor.send({ type: 'game.action', roomId, action: 'play-card', payload: { cardId: legalId } });
-  let [afterPlayHost, afterPlayGuest] = await Promise.all([
+  const [afterPlayHost, afterPlayGuest] = await Promise.all([
     host.waitFor('game.state', message => message.revision > peggingRevision && message.state?.playedCards?.length === 1),
     guest.waitFor('game.state', message => message.revision > peggingRevision && message.state?.playedCards?.length === 1),
   ]);
