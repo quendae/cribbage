@@ -14,7 +14,7 @@ check('session resume is persisted locally', mp.includes('session.resume') && mp
 check('Quick Play uses shared matchmaking queue', mp.includes("type: 'queue.join'") && html.includes("data-action=\"mp-quick\""));
 check('all table cards share player card CSS variables', html.includes('--game-card-w:94px') && html.includes('.peg-cards .card,.peg-cards .card-back') && html.includes('#resultCards .card,#resultCards .card-back'));
 check('illegal cards are transparent without grayscale', html.includes('.card.illegal{opacity:.28!important;filter:none!important}'));
-check('flight animation hides destination duplicate', html.includes('const flyingCards=new Set()') && html.includes("flyingCards.has(c.id)?'':cardHTML"));
+check('flight animation reserves and targets the final peg slot', html.includes('const flyingCards=new Set()') && html.includes('.flight-slot{visibility:hidden!important') && html.includes("slot.classList.add('flight-slot')") && html.includes('const to=slot.getBoundingClientRect()') && html.includes("flyingCards.has(c.id)?cardHTML(c,`played p${i%2} flight-slot`)"));
 check('authoritative animation handles opponent delta', html.includes('animateAuthoritativeDelta') && html.includes('optimisticNetworkCardId'));
 check('summary cards have space above Done button', html.includes('#resultModal #resultCards{margin-bottom:30px'));
 check('server scoring results are rendered without client addPoints', html.includes('openNetworkShowResult') && html.includes('item.score||{}'));
