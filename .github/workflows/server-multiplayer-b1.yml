@@ -1,4 +1,4 @@
-name: Cribbage QQND multiplayer B1
+name: Cribbage QQND multiplayer B2
 
 on:
   push:
@@ -18,24 +18,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Repair migration helper
-        run: |
-          python scripts/fix_patch_script.py
-          python scripts/fix_patch_script_v2.py
-      - name: Apply QQND multiplayer and UI fixes
-        run: python scripts/apply_server_multiplayer_b1.py
+      - name: Apply authoritative frontend migration
+        run: python scripts/apply_server_authoritative_b2.py
       - name: Run existing UI regression
         run: node tests/ui-regression.mjs
-      - name: Run server multiplayer regression
+      - name: Run authoritative multiplayer regression
         run: node tests/server-multiplayer-regression.mjs
-      - name: Commit generated changes
+      - name: Commit generated index
         run: |
-          if git diff --quiet -- index.html scripts/apply_server_multiplayer_b1.py; then
-            echo "generated files already up to date"
+          if git diff --quiet -- index.html; then
+            echo "index.html already up to date"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html scripts/apply_server_multiplayer_b1.py
-          git commit -m "feat: migrate Cribbage multiplayer to QQND server B1 [skip ci]"
+          git add index.html
+          git commit -m "feat: switch Cribbage frontend to server-authoritative B2 [skip ci]"
           git push
