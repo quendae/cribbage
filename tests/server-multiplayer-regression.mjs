@@ -19,6 +19,8 @@ check('authoritative animation handles opponent delta', html.includes('animateAu
 check('summary cards have space above Done button', html.includes('#resultModal #resultCards{margin-bottom:30px'));
 check('server scoring results are rendered without client addPoints', html.includes('openNetworkShowResult') && html.includes('item.score||{}'));
 check('persistent connection overlay exists', html.includes('networkPresenceOverlay') && html.includes('game.player.bot_takeover'));
+check('resumed in-game room restores multiplayer state', html.includes("e.detail.resumed&&(room.status==='in_game'||room.status==='playing')") && html.includes('mp.inGame=true;client.getState()'));
+check('bot takeover overlay reflects active server bot', html.includes('Bot przejął seat') && !html.includes('Cribbage nie ma jeszcze bota online'));
 check('public room browser exists', html.includes('mpPublicRooms') && html.includes('mp-join-public'));
 
 try { new Function(mp); check('multiplayer-server.js parses as JavaScript', true); } catch (error) { console.error(error); check('multiplayer-server.js parses as JavaScript', false); }
