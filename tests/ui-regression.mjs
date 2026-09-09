@@ -13,6 +13,11 @@ const checks = [
   ['developer tuning values persist locally', html.includes('cribbage.devUI.v1')],
   ['developer tuning values can be copied', html.includes('id="devUiCopy"')],
   ['new board path generator exists', html.includes('boardTrackPathV2')],
+  ['played destination card is withheld while its flight ghost is active', html.includes('flightCardIds') && /pegHistory\.filter\([^)]*flightCardIds/i.test(html)],
+  ['all gameplay and result cards share one player-card size token', html.includes('--game-card-w:94px') && html.includes('--game-card-h:134px') && html.includes('#resultCards') && html.includes('var(--game-card-w)')],
+  ['illegal cards stay colored and become transparent instead of desaturated', /\.card\.illegal\s*\{[^}]*opacity\s*:\s*\.2[0-9][^}]*filter\s*:\s*none/i.test(html)],
+  ['result cards have explicit breathing room above Done', /#resultModal\s+#resultCards\s*\{[^}]*margin-bottom\s*:\s*(2[4-9]|[3-9][0-9])px/i.test(html)],
+  ['QQND shared server multiplayer client is loaded', html.includes('multiplayer-server.js') && !html.includes('new RTCPeerConnection(')],
 ];
 
 let failed = 0;
