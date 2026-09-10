@@ -86,6 +86,7 @@
       --dev-starter-x:0px;--dev-starter-y:0px;
       --dev-crib-x:0px;--dev-crib-y:0px;
       --dev-pegging-x:0px;--dev-pegging-y:0px;--dev-pegging-scale:1;
+      --dev-count-x:0px;--dev-count-y:0px;--dev-count-scale:1;
       --dev-prompt-y:0px;--dev-controls-y:0px;
     }
     #app{zoom:var(--dev-ui-scale)}
@@ -125,6 +126,7 @@
     .starter-wrap{translate:var(--dev-starter-x) var(--dev-starter-y)}
     .crib-wrap{translate:var(--dev-crib-x) var(--dev-crib-y)}
     .peg-zone{translate:var(--dev-pegging-x) var(--dev-pegging-y);scale:var(--dev-pegging-scale)}
+    .felt>.count-orb{position:absolute;left:50%;top:68%;transform:translate(-50%,-50%);grid-column:auto;translate:var(--dev-count-x) var(--dev-count-y);scale:var(--dev-count-scale);transform-origin:center;z-index:7}
     .prompt{translate:0 var(--dev-prompt-y)}
     .controlbar{translate:0 var(--dev-controls-y)}
 
@@ -172,7 +174,7 @@
         <div class="seat top"><div id="topName" class="nameplate">BOT</div><div id="topHand" class="hand"></div></div>
         <div class="starter-wrap"><span class="zone-label" data-t="table.starter">Karta startowa</span><div id="starter"></div></div>
         <div class="crib-wrap"><span class="zone-label" data-t="table.crib">Krib</span><div id="cribPile"></div></div>
-        <div class="peg-zone"><div id="pegCards" class="peg-cards"></div><div id="countOrb" class="count-orb">0<small>/ 31</small></div></div>
+        <div class="peg-zone"><div id="pegCards" class="peg-cards"></div></div><div id="countOrb" class="count-orb">0<small>/ 31</small></div>
         <div id="prompt" class="prompt"><b id="promptTitle">Cribbage</b><span id="promptBody">Wybierz nową grę z menu.</span></div>
         <div class="seat bottom"><div id="bottomName" class="nameplate">TY</div><div id="bottomHand" class="hand"></div></div>
       </div>
@@ -463,7 +465,7 @@
 <script id="cribbageUiV2DevScript">
 (()=>{
   const KEY='cribbage.devUI.v1';
-  const defaults={uiScale:1,boardX:0,boardY:0,boardScale:1,playerX:0,playerY:0,playerScale:1,opponentX:0,opponentY:0,opponentScale:1,starterX:0,starterY:0,cribX:0,cribY:0,peggingX:0,peggingY:0,peggingScale:1,promptY:0,controlsY:0};
+  const defaults={uiScale:1,boardX:0,boardY:0,boardScale:1,playerX:0,playerY:0,playerScale:1,opponentX:0,opponentY:0,opponentScale:1,starterX:-40,starterY:60,cribX:40,cribY:60,peggingX:0,peggingY:0,peggingScale:1,countX:0,countY:0,countScale:1,promptY:0,controlsY:-50};
   const specs=[
     {group:'Globalnie'},{key:'uiScale',label:'UI scale',min:.75,max:1.35,step:.01},
     {group:'Plansza'},{key:'boardX',label:'Board X',min:-320,max:520,step:1},{key:'boardY',label:'Board Y',min:-320,max:320,step:1},{key:'boardScale',label:'Board scale',min:.5,max:1.6,step:.01},
@@ -471,6 +473,7 @@
     {group:'Przeciwnik'},{key:'opponentX',label:'Opponent X',min:-420,max:420,step:1},{key:'opponentY',label:'Opponent Y',min:-320,max:320,step:1},{key:'opponentScale',label:'Opponent scale',min:.6,max:1.5,step:.01},
     {group:'Karty środka'},{key:'starterX',label:'Starter X',min:-420,max:420,step:1},{key:'starterY',label:'Starter Y',min:-320,max:320,step:1},{key:'cribX',label:'Crib X',min:-420,max:420,step:1},{key:'cribY',label:'Crib Y',min:-320,max:320,step:1},
     {group:'Pegging'},{key:'peggingX',label:'Pegging X',min:-420,max:420,step:1},{key:'peggingY',label:'Pegging Y',min:-320,max:320,step:1},{key:'peggingScale',label:'Pegging scale',min:.6,max:1.5,step:.01},
+    {group:'Licznik 0 / 31'},{key:'countX',label:'Licznik X',min:-420,max:420,step:1},{key:'countY',label:'Licznik Y',min:-320,max:320,step:1},{key:'countScale',label:'Licznik scale',min:.6,max:1.5,step:.01},
     {group:'Komunikaty'},{key:'promptY',label:'Prompt Y',min:-320,max:320,step:1},{key:'controlsY',label:'Controls Y',min:-320,max:320,step:1}
   ];
   let values={...defaults};
@@ -484,6 +487,7 @@
     css.setProperty('--dev-opponent-x',px(values.opponentX));css.setProperty('--dev-opponent-y',px(values.opponentY));css.setProperty('--dev-opponent-scale',String(values.opponentScale));
     css.setProperty('--dev-starter-x',px(values.starterX));css.setProperty('--dev-starter-y',px(values.starterY));css.setProperty('--dev-crib-x',px(values.cribX));css.setProperty('--dev-crib-y',px(values.cribY));
     css.setProperty('--dev-pegging-x',px(values.peggingX));css.setProperty('--dev-pegging-y',px(values.peggingY));css.setProperty('--dev-pegging-scale',String(values.peggingScale));
+    css.setProperty('--dev-count-x',px(values.countX));css.setProperty('--dev-count-y',px(values.countY));css.setProperty('--dev-count-scale',String(values.countScale));
     css.setProperty('--dev-prompt-y',px(values.promptY));css.setProperty('--dev-controls-y',px(values.controlsY));
     try{localStorage.setItem(KEY,JSON.stringify(values))}catch(_){ }
   }

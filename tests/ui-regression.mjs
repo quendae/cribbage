@@ -19,6 +19,9 @@ const checks = [
   ['offline scoring modal waits for card flights', html.includes('afterCardFlights(()=>openShowItem())') && html.includes('afterCardFlights(()=>showGameOverModal(p))')],
   ['31 reset waits for the played card to land', html.includes('afterCardFlights(()=>resetPegSequence(1-p))')],
   ['table log uses themed scrollbar', html.includes('.log::-webkit-scrollbar') && html.includes('scrollbar-color:rgba(215,180,94')],
+  ['count orb has independent developer tuning', html.includes('--dev-count-x:0px') && html.includes("{key:'countX',label:'Licznik X'") && html.includes("{key:'countY',label:'Licznik Y'") && html.includes("{key:'countScale',label:'Licznik scale'")],
+  ['count orb defaults to the table center between cards and controls', html.includes('.felt>.count-orb{position:absolute;left:50%;top:68%;transform:translate(-50%,-50%)') && html.includes('translate:var(--dev-count-x) var(--dev-count-y);scale:var(--dev-count-scale)') && html.includes('</div><div id="countOrb" class="count-orb">0<small>/ 31</small></div>')],
+  ['approved dev tuning values are baked in', html.includes('starterX:-40,starterY:60,cribX:40,cribY:60') && html.includes('controlsY:-50')],
 ];
 
 let failed = 0;
