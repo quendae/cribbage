@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#10261b">
-  <title>Cribbage Offline</title>
+  <title>Cribbage</title>
+  <meta name="application-version" content="1.0.0">
   <style>
     :root{
       --bg:#07100c;--panel:#111a16;--panel2:#17231d;--felt:#15573a;--felt-hi:#20734c;--felt-dark:#0d3d29;
@@ -83,11 +84,11 @@
       --dev-board-x:0px;--dev-board-y:0px;--dev-board-scale:1;
       --dev-player-x:0px;--dev-player-y:0px;--dev-player-scale:1;
       --dev-opponent-x:0px;--dev-opponent-y:0px;--dev-opponent-scale:1;
-      --dev-starter-x:0px;--dev-starter-y:0px;
-      --dev-crib-x:0px;--dev-crib-y:0px;
+      --dev-starter-x:-40px;--dev-starter-y:60px;
+      --dev-crib-x:40px;--dev-crib-y:60px;
       --dev-pegging-x:0px;--dev-pegging-y:0px;--dev-pegging-scale:1;
       --dev-count-x:0px;--dev-count-y:0px;--dev-count-scale:1;
-      --dev-prompt-y:0px;--dev-controls-y:0px;
+      --dev-prompt-y:0px;--dev-controls-y:-50px;
     }
     #app{zoom:var(--dev-ui-scale)}
 
@@ -120,7 +121,9 @@
     .board-number.n120{top:63px}.board-number.n90{top:170px}.board-number.n60{top:285px}.board-number.n30{top:400px}
     .board-start,.board-finish{top:535px;transform:translateX(-50%);font-size:9px;letter-spacing:.08em}.board-start{left:77px}.board-finish{left:209px}.board-title{left:143px;top:526px;transform:translateX(-50%);font-size:10px;color:rgba(244,219,164,.72);background:rgba(56,28,13,.58);padding:3px 7px;border-radius:999px}
 
-    /* Dev UI tuning offsets compose with the existing responsive transforms. */
+    .score-reference .combo-list{gap:4px}.score-reference .combo-section{margin:8px 0 2px;padding-top:6px;border-top:1px solid rgba(215,180,94,.14);color:#d7b45e;font-size:8px;font-weight:900;letter-spacing:.12em}.score-reference .combo-section:first-child{margin-top:2px;padding-top:0;border-top:0}.score-reference .combo{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:7px;align-items:center;padding:2px 0;font-size:9px}.score-reference .combo i{width:24px;height:22px}.score-reference .combo span{display:block;line-height:1.28}.score-reference .combo b{color:#f0d58b;font-size:9px;font-weight:900;white-space:nowrap;text-align:right}.score-reference p{margin-bottom:8px}
+
+    /* Locked v1 layout offsets. */
     .seat.bottom{translate:var(--dev-player-x) var(--dev-player-y);scale:var(--dev-player-scale)}
     .seat.top{translate:var(--dev-opponent-x) var(--dev-opponent-y);scale:var(--dev-opponent-scale)}
     .starter-wrap{translate:var(--dev-starter-x) var(--dev-starter-y)}
@@ -130,13 +133,6 @@
     .prompt{translate:0 var(--dev-prompt-y)}
     .controlbar{translate:0 var(--dev-controls-y)}
 
-    .dev-ui-toggle{position:fixed;right:14px;bottom:14px;z-index:1200;border:1px solid rgba(240,213,139,.5);border-radius:999px;background:rgba(8,16,12,.9);color:#f0d58b;padding:8px 11px;font:900 10px/1 Inter,system-ui,sans-serif;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.34);backdrop-filter:blur(8px)}
-    .dev-ui-toggle:hover{background:#15241c}
-    .dev-ui-panel{position:fixed;right:14px;top:14px;z-index:1199;width:min(340px,calc(100vw - 28px));max-height:calc(100vh - 76px);overflow:auto;padding:14px;border:1px solid rgba(240,213,139,.32);border-radius:16px;background:linear-gradient(180deg,rgba(16,25,20,.97),rgba(7,13,10,.97));color:#edf5ef;box-shadow:0 24px 60px rgba(0,0,0,.5);backdrop-filter:blur(12px)}
-    .dev-ui-panel.hidden{display:none!important}.dev-ui-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.dev-ui-head strong{display:block;font:900 17px/1.1 Georgia,serif;color:#f3dfaa}.dev-ui-head small{display:block;margin-top:4px;color:#96aa9f;font-size:9px;line-height:1.35}.dev-ui-close{border:0;background:transparent;color:#aebdb5;font-size:19px;line-height:1;cursor:pointer}
-    .dev-ui-group{margin:13px 0 6px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);color:#d8ba70;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.dev-ui-group:first-child{margin-top:4px;border-top:0;padding-top:0}
-    .dev-ui-row{display:grid;grid-template-columns:88px minmax(0,1fr) 62px;gap:8px;align-items:center;margin:7px 0}.dev-ui-row label{color:#c6d2cb;font-size:10px}.dev-ui-row input[type="range"]{width:100%;accent-color:#d7b45e}.dev-ui-row input[type="number"]{width:62px;border:1px solid rgba(255,255,255,.13);border-radius:8px;background:#101a15;color:#eaf2ed;padding:5px 6px;font:800 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;text-align:right}
-    .dev-ui-actions{display:flex;gap:8px;margin-top:13px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08)}.dev-ui-actions button{flex:1;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(255,255,255,.045);color:#e8efeb;padding:8px;font-size:10px;font-weight:900;cursor:pointer}.dev-ui-actions button.primary{border-color:#9c7b31;background:linear-gradient(180deg,#efd37c,#c39a42);color:#211b0d}.dev-ui-actions button:hover{filter:brightness(1.08)}
     @media(max-width:1180px){.crib-board{top:122px;left:18px}}
   </style>
 
@@ -151,15 +147,15 @@
       <div class="stat hot"><span data-t="top.count">Suma</span><b id="countText">0 / 31</b></div>
       <div class="stat"><span data-t="top.dealer">Rozdający</span><b id="dealerText">—</b></div>
     </div>
-    <div class="top-actions"><button class="ghost" data-action="rules"><span>?</span> <span data-t="top.rules">Zasady</span></button><button class="ghost" data-action="settings"><span>⚙</span> <span data-t="top.options">Opcje</span></button><button class="ghost" data-action="menu"><span>⌂</span> <span data-t="top.menu">Menu</span></button></div>
+    <div class="top-actions"><button class="ghost" data-action="settings"><span>⚙</span> <span data-t="top.options">Opcje</span></button><button class="ghost" data-action="menu"><span>⌂</span> <span data-t="top.menu">Menu</span></button></div>
   </header>
   <main class="layout">
     <aside class="sidebar">
       <h2 class="section-title" data-t="side.score">Tablica punktów</h2>
       <div id="scores" class="scores"></div>
-      <section class="combo-box">
-        <div class="eyebrow" data-t="combo.eyebrow">CICHA ŚCIĄGA</div>
-        <p id="comboIntro">Kategorie warte sprawdzenia — bez wskazywania konkretnej karty.</p>
+      <section class="combo-box score-reference">
+        <div class="eyebrow" data-t="help.title">PUNKTACJA</div>
+        <p id="comboIntro" data-t="help.intro">Wszystkie sposoby zdobywania punktów — ręka, krib i rozgrywka.</p>
         <div id="comboList" class="combo-list"></div>
       </section>
       <div class="log-head"><h2 class="section-title" style="margin:0" data-t="side.log">Dziennik stołu</h2><button class="icon" style="width:28px;padding:3px" data-action="clear-log" aria-label="Wyczyść">×</button></div>
@@ -239,7 +235,6 @@
 
 <div id="tutorialModal" class="modal hidden"><section class="modal-card"><header class="modal-head"><div><div class="eyebrow" data-t="tutorial.eyebrow">SAMOUCZEK KROK PO KROKU</div><h2 data-t="tutorial.title">Kribidż w siedem kroków</h2></div><button class="icon" data-action="close-tutorial">×</button></header><div id="tutorialProgress" class="tutorial-progress"></div><div id="tutorialVisual" class="tutorial-visual"></div><div class="tutorial-body"><h3 id="tutorialTitle"></h3><p id="tutorialBody"></p></div><div class="tutorial-actions"><button id="tutorialPrev" class="action secondary" data-action="tutorial-prev"></button><button id="tutorialNext" class="action primary" data-action="tutorial-next"></button></div></section></div>
 
-<div id="rulesModal" class="modal hidden"><section class="modal-card"><header class="modal-head"><div><div class="eyebrow" data-t="rules.eyebrow">PUNKTACJA</div><h2 data-t="rules.title">Co brać pod uwagę</h2></div><button class="icon" data-action="close-rules">×</button></header><p class="modal-copy" data-t="rules.copy">To lista układów, nie odpowiedź „którą kartę zagrać”. Samodzielnie oceniasz ryzyko, krib i układ ręki.</p><div id="rulesContent" class="breakdown"></div><button class="action primary wide" data-action="close-rules" data-t="common.done">Gotowe</button></section></div>
 
 <div id="resultModal" class="modal hidden"><section class="modal-card"><header class="modal-head"><div><div class="eyebrow" data-t="result.eyebrow">LICZENIE RĘKI</div><h2 id="resultTitle">Wynik</h2></div></header><div class="result-grid"><div class="result-score"><div><b id="resultPoints">0</b><small data-t="result.points">punktów</small></div></div><div id="resultBreakdown" class="breakdown"></div></div><div id="resultCards" class="hand" style="min-height:112px"></div><button class="action primary wide" data-action="result-next" data-t="common.continue">Dalej</button></section></div>
 
@@ -288,6 +283,21 @@
   });
   Object.assign(copy.en,{'menu.p2p':'P2P multiplayer','mp.eyebrow':'PRIVATE P2P TABLE','mp.title':'Multiplayer without a game server','mp.lead':'Two players connect directly. Exchange connection codes using a messenger you trust. The host shuffles and enforces the rules; the guest receives only a safe table view.','mp.createTitle':'Create a private room','mp.joinTitle':'Join a room','mp.nick':'Your nickname','mp.password':'Password (optional)','mp.roomCode':'Room code','mp.create':'Create room','mp.offer':'Prepare join code','mp.room':'ROOM','mp.copyRoom':'Copy code','mp.hostStep':'Accept player','mp.hostHelp':'Paste the guest join code, accept it, then send the generated answer back.','mp.incoming':'Join code','mp.accept':'Accept','mp.answer':'Answer for guest','mp.copyAnswer':'Copy answer','mp.guestStep':'Exchange codes with host','mp.guestHelp':'Send your join code to the host, then paste their answer below.','mp.outgoing':'Your join code','mp.copyOffer':'Copy join code','mp.response':'Host answer','mp.connect':'Connect','mp.leave':'Leave room','mp.start':'Start game'});
   ['de','es','fr'].forEach(lang=>Object.entries(copy.en).forEach(([key,value])=>{if(key.startsWith('mp.')||key==='menu.p2p')copy[lang][key]??=value}));
+  Object.assign(copy.pl,{
+    'help.title':'PUNKTACJA','help.intro':'Wszystkie sposoby zdobywania punktów — ręka, krib i rozgrywka.','help.show':'RĘKA I KRIB','help.peg':'ROZGRYWKA DO 31','help.fifteens':'Każdy układ kart o sumie 15','help.pairsAll':'Para / trójka / czwórka','help.runs':'Sekwens 3 / 4 / 5 kart','help.runsAll':'Podwójny 3/4 · potrójny 3 · poczwórny 3','help.flushAll':'Kolor: ręka 4; z kartą startową 5; krib tylko 5','help.nobs':'Walet w kolorze karty startowej','help.heels':'Walet jako karta startowa — rozdający','help.peg15':'Suma dokładnie 15','help.peg31':'Suma dokładnie 31','help.pegPairs':'Para / trójka / czwórka na końcu','help.pegRuns':'Końcowy sekwens 3–7 kart','help.last':'„Dalej” / ostatnia karta (nie przy 31)'
+  });
+  Object.assign(copy.en,{
+    'help.title':'SCORING','help.intro':'Every way to score — hand, crib and pegging.','help.show':'HAND & CRIB','help.peg':'PEGGING TO 31','help.fifteens':'Every card combination totaling 15','help.pairsAll':'Pair / three of a kind / four of a kind','help.runs':'Run of 3 / 4 / 5 cards','help.runsAll':'Double 3/4 · triple 3 · quadruple 3','help.flushAll':'Flush: hand 4; with starter 5; crib only 5','help.nobs':'Jack matching the starter suit','help.heels':'Jack as starter — dealer scores','help.peg15':'Count exactly 15','help.peg31':'Count exactly 31','help.pegPairs':'Trailing pair / triple / quadruple','help.pegRuns':'Trailing run of 3–7 cards','help.last':'Go / last card (not on 31)'
+  });
+  Object.assign(copy.de,{
+    'help.title':'PUNKTE','help.intro':'Alle Wertungen — Hand, Crib und Pegging.','help.show':'HAND & CRIB','help.peg':'PEGGING BIS 31','help.fifteens':'Jede Kartenkombination mit Summe 15','help.pairsAll':'Paar / Drilling / Vierling','help.runs':'Folge aus 3 / 4 / 5 Karten','help.runsAll':'Doppelte 3/4 · dreifache 3 · vierfache 3','help.flushAll':'Flush: Hand 4; mit Starter 5; Crib nur 5','help.nobs':'Bube in der Farbe des Starters','help.heels':'Bube als Starter — Geber punktet','help.peg15':'Summe genau 15','help.peg31':'Summe genau 31','help.pegPairs':'Abschließendes Paar / Drilling / Vierling','help.pegRuns':'Abschließende Folge aus 3–7 Karten','help.last':'Go / letzte Karte (nicht bei 31)'
+  });
+  Object.assign(copy.es,{
+    'help.title':'PUNTUACIÓN','help.intro':'Todas las formas de puntuar: mano, crib y pegging.','help.show':'MANO Y CRIB','help.peg':'PEGGING HASTA 31','help.fifteens':'Cada combinación que suma 15','help.pairsAll':'Pareja / trío / póquer','help.runs':'Escalera de 3 / 4 / 5 cartas','help.runsAll':'Doble 3/4 · triple 3 · cuádruple 3','help.flushAll':'Color: mano 4; con starter 5; crib solo 5','help.nobs':'Jota del mismo palo que el starter','help.heels':'Jota como starter — puntúa el repartidor','help.peg15':'Cuenta exactamente 15','help.peg31':'Cuenta exactamente 31','help.pegPairs':'Pareja / trío / póquer final','help.pegRuns':'Escalera final de 3–7 cartas','help.last':'Go / última carta (no con 31)'
+  });
+  Object.assign(copy.fr,{
+    'help.title':'POINTS','help.intro':'Toutes les façons de marquer — main, crib et pegging.','help.show':'MAIN & CRIB','help.peg':'PEGGING JUSQU’À 31','help.fifteens':'Chaque combinaison totalisant 15','help.pairsAll':'Paire / brelan / carré','help.runs':'Suite de 3 / 4 / 5 cartes','help.runsAll':'Double 3/4 · triple 3 · quadruple 3','help.flushAll':'Couleur : main 4; avec starter 5; crib seulement 5','help.nobs':'Valet de la couleur du starter','help.heels':'Valet comme starter — le donneur marque','help.peg15':'Total exactement 15','help.peg31':'Total exactement 31','help.pegPairs':'Paire / brelan / carré final','help.pegRuns':'Suite finale de 3–7 cartes','help.last':'Go / dernière carte (pas sur 31)'
+  });
   let prefs={language:'pl',coach:'on',speed:650,animations:'on'};
   try{prefs={...prefs,...JSON.parse(localStorage.getItem(SETTINGS)||'{}')}}catch(_){ }
   let state=null, tutorialStep=0, botTimer=null, privacyFor=null;
@@ -301,8 +311,23 @@
   tutorial.de=[['121','Ziel des Spiels','Erreiche als Erster 121 Punkte. Punkte entstehen beim Ausspielen und später beim Zählen der Hände.'],['6 → 4','Geben und Crib','Jeder erhält 6 Karten und legt 2 verdeckt in den Crib. Diese Zusatzhand gehört dem Geber.'],['🂫','Starter und His Heels','Nach dem Ablegen wird der Starter aufgedeckt. Ein Bube als Starter bringt dem Geber sofort 2 Punkte.'],['15 · 31','Pegging','Pone beginnt. Spiele Karten, ohne 31 zu überschreiten. 15, 31, Paare und abschließende Folgen punkten.'],['GO','Go und Neustart','Passt keine Karte, sagst du Go. Die letzte Karte bringt 1 Punkt, außer sie erreicht genau 31.'],['2 · 2 · 3','Hand zählen','Prüfe alle Fünfzehner, jedes Paar, die längsten Folgen, Flush und Nobs.'],['● ●','Reihenfolge zählt','Zuerst zählt Pone, dann der Geber, zuletzt der Crib. Das Ziel beendet das Spiel sofort.']];
   tutorial.es=[['121','Objetivo','Sé el primero en llegar a 121 puntos. Se puntúa al jugar y después al contar cada mano.'],['6 → 4','Reparto y crib','Cada jugador recibe 6 cartas y pone 2 boca abajo en el crib, la mano extra del repartidor.'],['🂫','Starter y his heels','Tras descartar se descubre el starter. Si es una jota, el repartidor gana 2 puntos de inmediato.'],['15 · 31','Pegging','Pone empieza. Juega sin superar 31. Puntúan 15, 31, parejas y la escalera final más larga.'],['GO','Go y reinicio','Si ninguna carta cabe, dices go. La última carta da 1 punto, salvo si completa exactamente 31.'],['2 · 2 · 3','Contar la mano','Busca todos los quinces, cada pareja, las escaleras más largas, color y nobs.'],['● ●','El orden importa','Cuenta primero pone, luego el repartidor y al final el crib. Alcanzar el objetivo termina la partida.']];
   tutorial.fr=[['121','But du jeu','Soyez le premier à atteindre 121 points. On marque pendant le jeu puis lors du décompte des mains.'],['6 → 4','Donne et crib','Chaque joueur reçoit 6 cartes et en pose 2 face cachée dans le crib, la main bonus du donneur.'],['🂫','Starter et his heels','Après la défausse, on révèle le starter. Un valet donne immédiatement 2 points au donneur.'],['15 · 31','Pegging','Pone commence. Jouez sans dépasser 31. Marquez avec 15, 31, les paires et la plus longue suite finale.'],['GO','Go et remise à zéro','Si aucune carte ne convient, dites go. La dernière carte vaut 1, sauf si elle atteint exactement 31.'],['2 · 2 · 3','Compter la main','Cherchez tous les quinze, chaque paire, les plus longues suites, la couleur et nobs.'],['● ●','L’ordre compte','Pone compte, puis le donneur, puis le crib. Atteindre la cible termine immédiatement la partie.']];
-  const ruleItems=()=>[[t('combo.15'),'2'],[t('combo.pairs'),'2 / 6 / 12'],[t('combo.runs'),'3–5'],[t('combo.flush'),'4–5 / +1'],[t('combo.31'),'2'],[t('combo.go'),'1']];
-  function setLanguage(lang){prefs.language=copy[lang]?lang:'en';document.documentElement.lang=prefs.language;localStorage.setItem(SETTINGS,JSON.stringify(prefs));$$('[data-t]').forEach(n=>n.textContent=t(n.dataset.t));$('#menuLanguage').value=prefs.language;$('#languageSetting').value=prefs.language;$('#comboIntro').textContent=t('combo.intro');renderTutorial();renderRules();if(state)render();}
+  const scoreReferenceItems=()=>[
+    {section:t('help.show')},
+    {icon:'15',label:t('help.fifteens'),points:'2'},
+    {icon:'×',label:t('help.pairsAll'),points:'2 / 6 / 12'},
+    {icon:'↗',label:t('help.runs'),points:'3 / 4 / 5'},
+    {icon:'↗×',label:t('help.runsAll'),points:'6 / 8 / 9 / 12'},
+    {icon:'♣',label:t('help.flushAll'),points:'4 / 5'},
+    {icon:'J',label:t('help.nobs'),points:'1'},
+    {icon:'★',label:t('help.heels'),points:'2'},
+    {section:t('help.peg')},
+    {icon:'15',label:t('help.peg15'),points:'2'},
+    {icon:'31',label:t('help.peg31'),points:'2'},
+    {icon:'×',label:t('help.pegPairs'),points:'2 / 6 / 12'},
+    {icon:'↗',label:t('help.pegRuns'),points:'3–7'},
+    {icon:'GO',label:t('help.last'),points:'1'}
+  ];
+  function setLanguage(lang){prefs.language=copy[lang]?lang:'en';document.documentElement.lang=prefs.language;localStorage.setItem(SETTINGS,JSON.stringify(prefs));$$('[data-t]').forEach(n=>n.textContent=t(n.dataset.t));$('#menuLanguage').value=prefs.language;$('#languageSetting').value=prefs.language;$('#comboIntro').textContent=t('help.intro');renderTutorial();if(state)render();}
   function makeDeck(){let id=0;return SUITS.flatMap(s=>Array.from({length:13},(_,i)=>({s,r:i+1,id:`c${id++}`})));}
   function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
   const val=c=>Math.min(c.r,10), rank=c=>RANK_LABEL[c.r]||String(c.r), cardName=c=>`${rank(c)}${SUIT_SYMBOL[c.s]}`;
@@ -392,12 +417,11 @@
   }
   function renderScores(){renderCribBoard();if(!state){$('#scores').innerHTML='';return}$('#scores').innerHTML=state.names.map((name,p)=>`<div class="player-card ${state.active===p&&['discard','pegging'].includes(state.phase)?'active':''}"><div class="player-head"><div class="avatar">${name.slice(0,2).toUpperCase()}</div><div class="player-meta"><b>${escapeHtml(name)}</b><small>${t(p===state.dealer?'role.dealer':'role.pone')}</small></div><div class="big-score">${state.scores[p]}</div></div><div class="track"><i style="left:calc(${Math.min(1,state.scores[p]/state.target)*100}% - 6px)"></i></div><div class="track-label"><span>0</span><span>${state.target}</span></div>${p===state.dealer?`<em class="dealer-tag">${t('dealer.badge')}</em>`:''}</div>`).join('')}
   function renderHand(p,where){where.dataset.player=String(p);if(!state){where.innerHTML='';return}const isRemote=(state.mode==='network-host'||state.mode==='network-guest'||state.mode==='network-server')&&p===1;const isBot=state.mode==='bot'&&p===1;const localHidden=state.mode==='local'&&(privacyFor!==p||state.active!==p)&&['discard','pegging'].includes(state.phase);if(isBot||isRemote||localHidden){where.innerHTML=backs(state.hands[p].length);return}where.innerHTML=state.hands[p].map(c=>{const selected=state.selected.includes(c.id)?'selected':'';const illegal=state.phase==='pegging'&&state.count+val(c)>31?'illegal':'';return cardHTML(c,`${selected} ${illegal}`)}).join('')}
-  function renderCombo(){const phase=state?.phase;let keys,icons;if(phase==='discard'){keys=['combo.15','combo.pairs','combo.runs','combo.flush','combo.crib'];icons=['15','×2','↗','♣','▣']}else if(phase==='pegging'){keys=['combo.15','combo.31','combo.pairs','combo.runs','combo.go'];icons=['15','31','×2','↗','GO']}else{keys=['combo.15','combo.pairs','combo.runs','combo.flush','combo.starter'];icons=['15','×2','↗','♣','★']}$('#comboList').innerHTML=prefs.coach==='off'?`<div class="combo"><i>—</i><span>${t('common.off')}</span></div>`:keys.map((k,i)=>`<div class="combo"><i>${icons[i]}</i><span>${t(k)}</span></div>`).join('')}
+  function renderCombo(){const root=$('#comboList');if(prefs.coach==='off'){root.innerHTML=`<div class="combo"><i>—</i><span>${t('common.off')}</span></div>`;return}root.innerHTML=scoreReferenceItems().map(item=>item.section?`<div class="combo-section">${item.section}</div>`:`<div class="combo"><i>${item.icon}</i><span>${item.label}</span><b>${item.points}</b></div>`).join('')}
   function renderPrompt(){const prompt=$('#prompt');prompt.classList.toggle('phase-pegging',state?.phase==='pegging');prompt.classList.toggle('phase-discard',state?.phase==='discard');if(!state){$('#promptTitle').textContent='Cribbage';$('#promptBody').textContent=t('menu.subtitle');return}let title='',body='';if(state.phase==='discard'){title=t('prompt.discardTitle');body=t(state.dealer===state.active?'prompt.discardOwn':'prompt.discardOpp')}else if(state.phase==='pegging'){title=t('prompt.pegTitle');body=state.mode==='network-server'&&state.active===1?(prefs.language==='pl'?'Kolej rywala.':'Opponent’s turn.'):state.mode==='bot'&&state.active===1?t('prompt.botTurn'):state.mode==='local'?t('prompt.localTurn',{name:state.names[state.active]}):t('prompt.yourTurn')}else if(state.phase==='show'){title=t('phase.show');body=t('prompt.show')}else if(state.phase==='hand-end'){title=t('phase.hand-end');body=t('prompt.handEnd')}else if(state.phase==='gameover'){title=t('phase.gameover');body=t('prompt.gameover',{name:state.names[state.winnerPending]})}$('#promptTitle').textContent=title;$('#promptBody').textContent=body}
   function renderControls(){const box=$('#controls'),isDiscard=!!state&&state.phase==='discard'&&(state.mode==='local'||state.mode==='network-server'||state.active===0);box.classList.toggle('discard-mode',isDiscard);if(!state){box.innerHTML='';return}if(isDiscard){const copy=t(state.dealer===state.active?'prompt.discardOwn':'prompt.discardOpp');box.innerHTML=`<div class="discard-copy"><b>${t('prompt.discardTitle')}</b><span>${copy}</span></div><div class="discard-action"><span class="selection-note">${state.selected.length} / 2</span><button class="action primary" data-action="confirm-discard" ${state.selected.length===2?'':'disabled'}>${t('action.discard')}</button></div>`}else if(state.phase==='pegging'&&(state.mode==='local'||state.active===0)&&legalCards(state.active).length===0){box.innerHTML=`<button class="action primary" data-action="go">${t('action.go')}</button>`}else if(state.phase==='hand-end'){box.innerHTML=`<button class="action primary" data-action="next-hand">${t('action.nextHand')}</button>`}else box.innerHTML=''}
   function render(){renderScores();renderCombo();renderPrompt();renderControls();if(!state)return;$('#handNo').textContent=state.handNo;$('#phaseText').textContent=t(`phase.${state.phase}`);$('#countText').textContent=`${state.count} / 31`;$('#countOrb').childNodes[0].nodeValue=String(state.count);$('#dealerText').textContent=state.names[state.dealer];const followTurn=state.mode==='local'&&['discard','pegging'].includes(state.phase),bottomPlayer=followTurn?state.active:0,topPlayer=1-bottomPlayer;$('#topName').textContent=state.names[topPlayer];$('#bottomName').textContent=state.names[bottomPlayer];renderHand(topPlayer,$('#topHand'));renderHand(bottomPlayer,$('#bottomHand'));$('#starter').innerHTML=state.starter?cardHTML(state.starter):backs(1);$('#starter button')?.setAttribute('disabled','');$('#cribPile').innerHTML=backs(Math.min(4,state.crib.length));$('#pegCards').innerHTML=state.pegHistory.map((c,i)=>flyingCards.has(c.id)?cardHTML(c,`played p${i%2} flight-slot`):cardHTML(c,`played p${i%2}`)).join('');$('#pegCards').querySelectorAll('button').forEach((b,i)=>{b.disabled=true;b.style.setProperty('--rot',`${(i-(state.pegHistory.length-1)/2)*4}deg`);b.style.setProperty('--lift',`${Math.abs(i-(state.pegHistory.length-1)/2)*2}px`)});$('#log').innerHTML=state.log.map(x=>`<div><strong>${x.time}</strong> · ${escapeHtml(x.msg)}</div>`).join('');save()}
   function renderTutorial(){const steps=tutorial[prefs.language]||tutorial.en,tStep=steps[tutorialStep]||steps[0];$('#tutorialProgress').innerHTML=steps.map((_,i)=>`<i class="${i<=tutorialStep?'done':''}"></i>`).join('');$('#tutorialVisual').textContent=tStep[0];$('#tutorialTitle').textContent=tStep[1];$('#tutorialBody').textContent=tStep[2];$('#tutorialPrev').textContent=t('tutorial.back');$('#tutorialPrev').disabled=tutorialStep===0;$('#tutorialNext').textContent=tutorialStep===steps.length-1?t('tutorial.train'):t('tutorial.next')}
-  function renderRules(){if(!$('#rulesContent'))return;$('#rulesContent').innerHTML=ruleItems().map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join('')}
   function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
   function pop(msg){const old=$('.score-pop');if(old)old.remove();const n=document.createElement('div');n.className='score-pop';n.textContent=msg;$('.felt').appendChild(n);setTimeout(()=>n.remove(),1150)}
   function toast(msg){const n=$('#toast');n.textContent=msg;n.classList.remove('hidden');clearTimeout(n._timer);n._timer=setTimeout(()=>n.classList.add('hidden'),2200)}
@@ -446,65 +470,12 @@
   document.addEventListener('click',networkClickInterceptor,true);
   document.addEventListener('click',multiplayerUiClick,true);
   document.addEventListener('click',e=>{const card=e.target.closest('[data-card]');if(card&&state){const id=card.dataset.card,hand=card.closest('.hand'),p=hand?.dataset.player===undefined?null:Number(hand.dataset.player);if(p===null)return;if(state.phase==='discard'&&p===0&&(state.mode==='network-server'||(state.active===p&&(state.mode==='local'||p===0)))){if(state.selected.includes(id))state.selected=state.selected.filter(x=>x!==id);else if(state.selected.length<2)state.selected.push(id);render()}else if(state.phase==='pegging'&&state.active===p&&(state.mode==='local'||p===0))playCard(p,id);return}
-    const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action;if(a==='menu'){$('#mainMenu').classList.remove('hidden');$('#continueBtn').classList.toggle('hidden',!state)}else if(a==='continue'){const saved=state||loadSaved();if(!saved){toast(t('toast.noSave'));return}state=saved;closeAll();render();if(state.phase==='show')openShowItem();else if(state.phase==='pegging')handleTurn()}else if(a==='new-bot')openNew('bot');else if(a==='multiplayer-choice'){$('#multiplayerChoiceModal').classList.remove('hidden')}else if(a==='multiplayer-local'){$('#multiplayerChoiceModal').classList.add('hidden');openNew('local')}else if(a==='multiplayer-online'){$('#multiplayerChoiceModal').classList.add('hidden');openMultiplayer()}else if(a==='close-multiplayer-choice'){$('#multiplayerChoiceModal').classList.add('hidden')}else if(a==='close-new')$('#newGameModal').classList.add('hidden');else if(a==='start-game')startGame(false);else if(a==='confirm-discard')confirmDiscard();else if(a==='go')callGo();else if(a==='next-hand')nextHand();else if(a==='settings'){$('#settingsModal').classList.remove('hidden')}else if(a==='close-settings'){$('#settingsModal').classList.add('hidden');prefs.coach=$('#coachSetting').value;prefs.speed=Number($('#speedSetting').value);prefs.animations=$('#animationSetting').value;localStorage.setItem(SETTINGS,JSON.stringify(prefs));render()}else if(a==='tutorial'){tutorialStep=0;renderTutorial();$('#tutorialModal').classList.remove('hidden')}else if(a==='close-tutorial')$('#tutorialModal').classList.add('hidden');else if(a==='tutorial-prev'){tutorialStep=Math.max(0,tutorialStep-1);renderTutorial()}else if(a==='tutorial-next'){const len=(tutorial[prefs.language]||tutorial.en).length;if(tutorialStep<len-1){tutorialStep++;renderTutorial()}else{closeAll();$('#gameMode').value='bot';startGame(true)}}else if(a==='rules'){renderRules();$('#rulesModal').classList.remove('hidden')}else if(a==='close-rules')$('#rulesModal').classList.add('hidden');else if(a==='privacy-ready')privacyReady();else if(a==='result-next')nextResult();else if(a==='clear-log'){state.log=[];render()}});
+    const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action;if(a==='menu'){$('#mainMenu').classList.remove('hidden');$('#continueBtn').classList.toggle('hidden',!state)}else if(a==='continue'){const saved=state||loadSaved();if(!saved){toast(t('toast.noSave'));return}state=saved;closeAll();render();if(state.phase==='show')openShowItem();else if(state.phase==='pegging')handleTurn()}else if(a==='new-bot')openNew('bot');else if(a==='multiplayer-choice'){$('#multiplayerChoiceModal').classList.remove('hidden')}else if(a==='multiplayer-local'){$('#multiplayerChoiceModal').classList.add('hidden');openNew('local')}else if(a==='multiplayer-online'){$('#multiplayerChoiceModal').classList.add('hidden');openMultiplayer()}else if(a==='close-multiplayer-choice'){$('#multiplayerChoiceModal').classList.add('hidden')}else if(a==='close-new')$('#newGameModal').classList.add('hidden');else if(a==='start-game')startGame(false);else if(a==='confirm-discard')confirmDiscard();else if(a==='go')callGo();else if(a==='next-hand')nextHand();else if(a==='settings'){$('#settingsModal').classList.remove('hidden')}else if(a==='close-settings'){$('#settingsModal').classList.add('hidden');prefs.coach=$('#coachSetting').value;prefs.speed=Number($('#speedSetting').value);prefs.animations=$('#animationSetting').value;localStorage.setItem(SETTINGS,JSON.stringify(prefs));render()}else if(a==='tutorial'){tutorialStep=0;renderTutorial();$('#tutorialModal').classList.remove('hidden')}else if(a==='close-tutorial')$('#tutorialModal').classList.add('hidden');else if(a==='tutorial-prev'){tutorialStep=Math.max(0,tutorialStep-1);renderTutorial()}else if(a==='tutorial-next'){const len=(tutorial[prefs.language]||tutorial.en).length;if(tutorialStep<len-1){tutorialStep++;renderTutorial()}else{closeAll();$('#gameMode').value='bot';startGame(true)}}else if(a==='privacy-ready')privacyReady();else if(a==='result-next')nextResult();else if(a==='clear-log'){state.log=[];render()}});
   $('#menuLanguage').addEventListener('change',e=>setLanguage(e.target.value));$('#languageSetting').addEventListener('change',e=>setLanguage(e.target.value));
   $('#animationSetting').addEventListener('change',e=>document.body.classList.toggle('no-animations',e.target.value==='off'));
   $('#continueBtn').addEventListener('click',()=>setTimeout(()=>{if(state?.phase==='gameover')finishGame(state.winnerPending)},0));
   window.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.modal').forEach(x=>x.classList.add('hidden'));if(e.key==='Enter'&&!$('#privacyOverlay').classList.contains('hidden'))privacyReady()});
-  $('#coachSetting').value=prefs.coach;$('#speedSetting').value=String(prefs.speed);$('#animationSetting').value=prefs.animations;document.body.classList.toggle('no-animations',prefs.animations==='off');setLanguage(prefs.language);renderRules();renderTutorial();const saved=loadSaved();$('#continueBtn').classList.toggle('hidden',!saved);if(saved)state=saved;render();
-})();
-</script>
-
-<!-- cribbage-ui-v2 -->
-<button id="devUiToggle" class="dev-ui-toggle" type="button" title="UI tuning · F2">DEV</button>
-<aside id="devUiPanel" class="dev-ui-panel hidden" aria-label="Developer UI tuning">
-  <div class="dev-ui-head"><div><strong>UI tuning</strong><small>F2 otwiera panel. Wartości zapisują się lokalnie; „Kopiuj wartości” daje JSON do późniejszego dostrojenia.</small></div><button id="devUiClose" class="dev-ui-close" type="button" aria-label="Zamknij">×</button></div>
-  <div id="devUiControls"></div>
-  <div class="dev-ui-actions"><button id="devUiReset" type="button">Reset</button><button id="devUiCopy" class="primary" type="button">Kopiuj wartości</button></div>
-</aside>
-<script id="cribbageUiV2DevScript">
-(()=>{
-  const KEY='cribbage.devUI.v1';
-  const defaults={uiScale:1,boardX:0,boardY:0,boardScale:1,playerX:0,playerY:0,playerScale:1,opponentX:0,opponentY:0,opponentScale:1,starterX:-40,starterY:60,cribX:40,cribY:60,peggingX:0,peggingY:0,peggingScale:1,countX:0,countY:0,countScale:1,promptY:0,controlsY:-50};
-  const specs=[
-    {group:'Globalnie'},{key:'uiScale',label:'UI scale',min:.75,max:1.35,step:.01},
-    {group:'Plansza'},{key:'boardX',label:'Board X',min:-320,max:520,step:1},{key:'boardY',label:'Board Y',min:-320,max:320,step:1},{key:'boardScale',label:'Board scale',min:.5,max:1.6,step:.01},
-    {group:'Ręka gracza'},{key:'playerX',label:'Player X',min:-420,max:420,step:1},{key:'playerY',label:'Player Y',min:-320,max:320,step:1},{key:'playerScale',label:'Player scale',min:.6,max:1.5,step:.01},
-    {group:'Przeciwnik'},{key:'opponentX',label:'Opponent X',min:-420,max:420,step:1},{key:'opponentY',label:'Opponent Y',min:-320,max:320,step:1},{key:'opponentScale',label:'Opponent scale',min:.6,max:1.5,step:.01},
-    {group:'Karty środka'},{key:'starterX',label:'Starter X',min:-420,max:420,step:1},{key:'starterY',label:'Starter Y',min:-320,max:320,step:1},{key:'cribX',label:'Crib X',min:-420,max:420,step:1},{key:'cribY',label:'Crib Y',min:-320,max:320,step:1},
-    {group:'Pegging'},{key:'peggingX',label:'Pegging X',min:-420,max:420,step:1},{key:'peggingY',label:'Pegging Y',min:-320,max:320,step:1},{key:'peggingScale',label:'Pegging scale',min:.6,max:1.5,step:.01},
-    {group:'Licznik 0 / 31'},{key:'countX',label:'Licznik X',min:-420,max:420,step:1},{key:'countY',label:'Licznik Y',min:-320,max:320,step:1},{key:'countScale',label:'Licznik scale',min:.6,max:1.5,step:.01},
-    {group:'Komunikaty'},{key:'promptY',label:'Prompt Y',min:-320,max:320,step:1},{key:'controlsY',label:'Controls Y',min:-320,max:320,step:1}
-  ];
-  let values={...defaults};
-  try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}');for(const key of Object.keys(defaults))if(Number.isFinite(Number(saved[key])))values[key]=Number(saved[key])}catch(_){ }
-  const css=document.documentElement.style;
-  const px=v=>`${Number(v)||0}px`;
-  function apply(){
-    css.setProperty('--dev-ui-scale',String(values.uiScale));
-    css.setProperty('--dev-board-x',px(values.boardX));css.setProperty('--dev-board-y',px(values.boardY));css.setProperty('--dev-board-scale',String(values.boardScale));
-    css.setProperty('--dev-player-x',px(values.playerX));css.setProperty('--dev-player-y',px(values.playerY));css.setProperty('--dev-player-scale',String(values.playerScale));
-    css.setProperty('--dev-opponent-x',px(values.opponentX));css.setProperty('--dev-opponent-y',px(values.opponentY));css.setProperty('--dev-opponent-scale',String(values.opponentScale));
-    css.setProperty('--dev-starter-x',px(values.starterX));css.setProperty('--dev-starter-y',px(values.starterY));css.setProperty('--dev-crib-x',px(values.cribX));css.setProperty('--dev-crib-y',px(values.cribY));
-    css.setProperty('--dev-pegging-x',px(values.peggingX));css.setProperty('--dev-pegging-y',px(values.peggingY));css.setProperty('--dev-pegging-scale',String(values.peggingScale));
-    css.setProperty('--dev-count-x',px(values.countX));css.setProperty('--dev-count-y',px(values.countY));css.setProperty('--dev-count-scale',String(values.countScale));
-    css.setProperty('--dev-prompt-y',px(values.promptY));css.setProperty('--dev-controls-y',px(values.controlsY));
-    try{localStorage.setItem(KEY,JSON.stringify(values))}catch(_){ }
-  }
-  const controls=document.getElementById('devUiControls'),panel=document.getElementById('devUiPanel'),toggle=document.getElementById('devUiToggle');
-  const inputPairs=new Map();
-  for(const spec of specs){
-    if(spec.group){const h=document.createElement('div');h.className='dev-ui-group';h.textContent=spec.group;controls.appendChild(h);continue}
-    const row=document.createElement('div');row.className='dev-ui-row';const label=document.createElement('label');label.textContent=spec.label;const range=document.createElement('input');range.type='range';range.min=spec.min;range.max=spec.max;range.step=spec.step;range.value=values[spec.key];const number=document.createElement('input');number.type='number';number.min=spec.min;number.max=spec.max;number.step=spec.step;number.value=values[spec.key];
-    const update=raw=>{let v=Number(raw);if(!Number.isFinite(v))v=defaults[spec.key];v=Math.max(spec.min,Math.min(spec.max,v));values[spec.key]=v;range.value=String(v);number.value=String(v);apply()};range.addEventListener('input',()=>update(range.value));number.addEventListener('input',()=>update(number.value));row.append(label,range,number);controls.appendChild(row);inputPairs.set(spec.key,{range,number})
-  }
-  function setOpen(open){panel.classList.toggle('hidden',!open);toggle.textContent=open?'DEV ×':'DEV'}
-  toggle.addEventListener('click',()=>setOpen(panel.classList.contains('hidden')));document.getElementById('devUiClose').addEventListener('click',()=>setOpen(false));
-  addEventListener('keydown',e=>{if(e.key==='F2'||(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='d')){e.preventDefault();setOpen(panel.classList.contains('hidden'))}});
-  document.getElementById('devUiReset').addEventListener('click',()=>{values={...defaults};for(const [key,pair] of inputPairs){pair.range.value=String(values[key]);pair.number.value=String(values[key])}apply()});
-  document.getElementById('devUiCopy').addEventListener('click',async e=>{const text=JSON.stringify(values,null,2);try{await navigator.clipboard.writeText(text);e.currentTarget.textContent='Skopiowano';setTimeout(()=>e.currentTarget.textContent='Kopiuj wartości',1200)}catch(_){const area=document.createElement('textarea');area.value=text;document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();e.currentTarget.textContent='Skopiowano';setTimeout(()=>e.currentTarget.textContent='Kopiuj wartości',1200)}});
-  window.cribbageDevUI={get:()=>({...values}),set:patch=>{for(const key of Object.keys(defaults))if(Object.hasOwn(patch,key)&&Number.isFinite(Number(patch[key])))values[key]=Number(patch[key]);for(const [key,pair] of inputPairs){pair.range.value=String(values[key]);pair.number.value=String(values[key])}apply();return{...values}},reset:()=>{document.getElementById('devUiReset').click();return{...values}}};
-  apply();
+  $('#coachSetting').value=prefs.coach;$('#speedSetting').value=String(prefs.speed);$('#animationSetting').value=prefs.animations;document.body.classList.toggle('no-animations',prefs.animations==='off');setLanguage(prefs.language);renderTutorial();const saved=loadSaved();$('#continueBtn').classList.toggle('hidden',!saved);if(saved)state=saved;render();
 })();
 </script>
 
